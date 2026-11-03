@@ -10,16 +10,19 @@ Portable agent skills in the open [Agent Skills](https://agentskills.io/specific
 
 ## Install
 
-Link the skill folder into each harness's user-level skills directory. Run this from the repo root:
+Install with the [`skills` CLI](https://www.skills.sh/docs/cli). It detects the agents on your machine and links the skill into each one's skills directory.
 
 ```bash
-mkdir -p ~/.agents/skills ~/.claude/skills ~/.gemini/skills
-ln -sn "$PWD/skills/plan-audit" ~/.agents/skills/plan-audit   # Codex, Cursor
-ln -sn "$PWD/skills/plan-audit" ~/.claude/skills/plan-audit   # Claude Code
-ln -sn "$PWD/skills/plan-audit" ~/.gemini/skills/plan-audit   # Gemini CLI, Antigravity CLI
+npx skills add robertguss/agent-skills --skill plan-audit --global
 ```
 
-`ln -sn` refuses to replace an existing path and stops with "File exists". When that happens, check where the existing link points with `readlink -f ~/.claude/skills/plan-audit` (or the matching path). If it isn't this checkout, remove the old link and run the command again.
+Useful flags:
+
+- `--global` (`-g`) installs at user level, so the skill works in every repo. Leave it off to install into the current project only.
+- `--agent` (`-a`) picks the agents to install to, for example `-a claude-code codex cursor gemini-cli antigravity-cli`. Leave it off to choose interactively.
+- `--list` (`-l`) shows the skills in this repo without installing anything.
+
+Keep it current with `npx skills update`, and remove it with `npx skills remove plan-audit --global`.
 
 ## Use `plan-audit`
 
@@ -43,7 +46,7 @@ codex exec --sandbox workspace-write '$plan-audit headless docs/plans/my-plan.md
 
 # Claude Code: allow file edits plus the commands the audit runs for evidence.
 # The prompt goes first: --allowedTools takes a list and would swallow it.
-# --add-dir lets the run read the skill's reference files through the symlink.
+# --add-dir lets the run read the skill's reference files where the CLI installed them.
 # Add your project's test command to --allowedTools so the audit can run the suite.
 claude -p '/plan-audit headless docs/plans/my-plan.md' --add-dir "$(readlink -f ~/.claude/skills/plan-audit)" \
   --permission-mode acceptEdits --allowedTools "Bash(git:*)" "Bash(python3:*)"
