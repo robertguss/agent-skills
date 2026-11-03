@@ -13,7 +13,7 @@ Plan file names describe the feature, never the planted problem, so the file nam
 
 Files:
 
-- `setup.sh` builds a fresh git repo from the fixture and the plans.
+- `setup.sh` builds a fresh git repo from the fixture and one plan.
 - `expected.md` is the test oracle. It was frozen before the first eval run; see the rules at its top before changing it.
 - `fixture-repo/` is the project the plans are about.
 - `plans/` holds the four plans.
@@ -25,20 +25,20 @@ Install the skill for both harnesses as described in the top-level `README.md`. 
 ## Build an eval repo
 
 ```sh
-evals/plan-audit/setup.sh            # creates a temp dir and prints its path
-evals/plan-audit/setup.sh /tmp/pa-01 # or build into an empty or new directory
+evals/plan-audit/setup.sh <plan>            # creates a temp dir and prints its path
+evals/plan-audit/setup.sh <plan> /tmp/pa-01 # or build into an empty or new directory
 ```
 
-The script copies the fixture, puts the plans under `docs/plans/`, runs `git init`, and commits everything. Run each eval from inside the printed directory, never from this repo.
+The script copies the fixture, puts the named plan under `docs/plans/`, runs `git init`, and commits everything. Run each eval from inside the printed directory, never from this repo.
 
 Use a fresh repo for every run. A report left by an earlier run would make the next run's header show a dirty tree, and the collision rule would change the report's file name. The collision check below is the one exception.
 
 Check the generated repo once:
 
 ```sh
-cd "$(evals/plan-audit/setup.sh)"
+cd "$(evals/plan-audit/setup.sh stats-command-plan.md)"
 python3 -m unittest discover   # 15 tests, all pass
-ls docs/plans                  # the four plans
+ls docs/plans                  # just the plan you named
 git status --short             # empty
 ```
 
@@ -55,10 +55,10 @@ codex exec --sandbox workspace-write '$plan-audit headless docs/plans/<plan>' </
 Claude Code:
 
 ```sh
-claude -p '/plan-audit headless docs/plans/<plan>' --permission-mode acceptEdits --allowedTools "Bash(python3:*)" "Bash(git:*)"
+claude -p '/plan-audit headless docs/plans/<plan>' --add-dir "$(readlink -f ~/.claude/skills/plan-audit)" --permission-mode acceptEdits --allowedTools "Bash(python3:*)" "Bash(git:*)"
 ```
 
-The prompt goes before `--allowedTools` because that option takes a list and would swallow a prompt placed after it.
+The prompt goes before `--allowedTools` because that option takes a list and would swallow a prompt placed after it. `--add-dir` lets the run read the skill's own reference files, which sit outside the eval repo when the skill is installed by symlink.
 
 The word `headless` matters. Without it the skill treats the run as interactive and may stop to ask questions no one can answer.
 

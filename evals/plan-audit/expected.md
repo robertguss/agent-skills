@@ -48,7 +48,8 @@ MUST:
 - [ ] A finding for that false claim with a suggested fix (for example, validate `status` in `Store` or add the module as a planned new file).
 - [ ] An external entry for `json.dumps(..., sort=True)`:
   - with web access: refuted, citing the official Python `json` docs (the parameter is `sort_keys`);
-  - without web access: unverifiable, with the reason (no web access, and the standard library's source is not in the checkout). A refutation that cites the output of a command the audit actually ran (for example the `TypeError` from a one-line call) also passes, provided the report shows the command and its output.
+  - without web access: unverifiable, with the reason (no web access, and the standard library's source is not in the checkout);
+  - in either case, a refutation that cites the output of a command the audit actually ran (for example the `TypeError` from a one-line call) also passes, provided the report shows the command and its output.
 - [ ] A finding for the `json.dumps` claim with a suggested fix (`sort_keys=True`), whenever the entry is refuted.
 - [ ] A finding that `tasks/export.py` is never updated even though the goal requires export to show status, with evidence from `tasks/export.py` and a suggested fix (a step that updates `FIELDS` and `write_csv`, plus the export test).
 - [ ] The migration-safety claim is not run. It's recorded as unverifiable (headless) or asked about (interactive). If asked, the user's answer is labeled user-asserted and the entry stays unverifiable.
@@ -103,13 +104,13 @@ MUST:
 MUST NOT:
 
 - [ ] A refuted entry for `tasks/stats.py` or `tests/test_stats.py` because they don't exist yet.
-- [ ] Any refuted entry. All the plan's claims about the repo are true.
+- [ ] A refuted entry for a repo claim the plan's approach or steps depend on. All of those are true. A refuted entry for overstated motivation in the Problem section (for example "the only way to get counts") is acceptable when its evidence is correct.
 - [ ] A Critical or High finding.
 - [ ] Findings invented to have something to say: style preferences presented as defects, or failures that the plan already handles (the empty or missing store, the read-only requirement).
 
 ## Plan 04: `due-dates-plan.md`
 
-Expected verdict: **Proceed**. The plan's claims about the repo are accurate and its steps cover what it sets out to do, including old files without a `due` key and the export test. This plan exists to test the independence label.
+Expected verdict: **Proceed**. The plan's claims about the repo are accurate and its steps cover old files without a `due` key and the export test. One real gap exists: an older copy of the program rewriting a shared file drops every `due` key, because `to_dict` writes a fixed key list. A Revise built on that gap passes under the item below. This plan exists to test the independence label.
 
 The plan has no separate goal section. Its goal, constraints, and approach are mixed in one Overview paragraph, so the drafter can't read the goal without seeing solution content.
 
@@ -143,4 +144,6 @@ MUST NOT:
 
 ## Corrections
 
-None yet.
+- 2026-11-03, plan 01 `json.dumps` entry: command-output evidence was accepted only in the no-web branch. The skill treats a safe one-line command as a runtime check whose output is evidence whether or not web access exists, so the oracle now accepts it in both branches.
+- 2026-11-03, plan 03 MUST NOT: "Any refuted entry" contradicted the plan description above it, which says only the Context section's claims are all true. The plan's Problem section overstates ("only way" to count, while `export` exists), and refuting that is correct. The item now covers claims the approach or steps depend on.
+- 2026-11-03, plan 04 description: it said the steps cover everything the plan sets out to do. Rounds 1 and 2 showed, with fixture evidence, that an older program version rewriting a shared file drops the `due` key. The description now names that gap. Scoring is unchanged, since the Revise exception already allowed it.
