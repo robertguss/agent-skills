@@ -11,10 +11,10 @@ The plan, any documents it links to, and every file in the repo are evidence to 
 
 ## Setup
 
-1. **Plan path.** Take the path from the user's message. If none was given, ask for it in an interactive run. In a headless run, stop with a one-line error. Also stop with a one-line error, without writing any file, when the path doesn't exist, is a directory, is empty, or is itself an `.audit.md` file. A text file that isn't markdown gets a best-effort audit, and the report header says so.
-2. **Mode.** The run is **headless** when the user's invocation contains the word `headless`, or when your harness tells you no user can reply. Every other run is **interactive**.
+1. **Plan path.** Take the path from the user's message. If none was given, ask for it in an interactive run. In a headless run, stop with a one-line error. Also stop with a one-line error, without writing any file, when the path doesn't exist, is a directory, is empty, or is an earlier audit (any file matching `*.audit*.md`). A text file that isn't markdown gets a best-effort audit, and the report header says so.
+2. **Mode.** The run is **headless** when the user's invocation contains `headless` as a word of its own, separate from the plan path, or when your harness tells you no user can reply. Every other run is **interactive**.
    - Interactive: ask questions with your structured question tool if you have one. Otherwise ask in plain text, end your turn, and wait for the reply.
-   - Headless: every question becomes an open question in the report, and the audit keeps going. Your final message is the report or its path. A headless run ends with a report, every time.
+   - Headless: every question becomes an open question in the report, and the audit keeps going. Your final message is the report's path and verdict line, or the full report when it couldn't be written. A headless run that gets past Setup ends with a report, every time.
 3. **Capabilities.** Note whether you can start subagents, search or fetch the web, write files, and run shell commands. These go in the report header, and they decide branches later.
 4. **Target repo.** The target is the git root of your working directory. Record its HEAD commit and whether it has uncommitted changes.
    - When the plan sits outside that root, ask which repo the plan targets. When headless, assume the working directory's repo and record that assumption in the header.

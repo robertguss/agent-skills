@@ -45,7 +45,7 @@ These run without asking:
 
 Put any scratch files you create, such as benchmark data, in the system temp directory, and delete them when you're done.
 
-Before and after any test run, compare `git status`. If a run changed a tracked file, leave the file as it is, record the change in the report's run notes as a side effect of the audit, and run no further test commands. It is not a finding against the plan.
+Before and after any test run, compare `git status`, and record the result in that run's ledger entry ("`git status` unchanged before and after", or what changed). If a run changed a tracked file, leave the file as it is, record the change in the report's run notes as a side effect of the audit, and run no further test commands. It is not a finding against the plan.
 
 Anything that would install, migrate, write outside ignored paths, reach external systems, or that you can't classify from its configuration is asked about first in an interactive run. In a headless run it isn't run, and the entry is unverifiable with the reason.
 
@@ -66,7 +66,7 @@ In a headless run, every such entry goes on the report's open-questions list.
 
 With subagents, you own the ledger and the subagents verify slices of it:
 
-1. Split the ledger by kind or by plan section, and give each subagent its entries, the target repo path, and the rules in this file from "Verify each entry" through "Command policy".
+1. Split the ledger by kind or by plan section. Give each subagent its entries, the plan path, the target repo path, the "Rules for every phase" section of `SKILL.md`, and the rules in this file from "Verify each entry" through "Command policy".
 2. Each subagent returns a verdict and evidence for each entry, plus a list of the entries it couldn't verify. Subagents ask the user nothing.
 3. Merge duplicate questions across subagents. In an interactive run, ask as each subagent's results arrive.
 4. When an answer affects entries a subagent already returned, check those entries again yourself. Ask about each entry at most once, unless new evidence comes up.

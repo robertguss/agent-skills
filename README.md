@@ -14,12 +14,12 @@ Link the skill folder into each harness's user-level skills directory. Run this 
 
 ```bash
 mkdir -p ~/.agents/skills ~/.claude/skills ~/.gemini/skills
-ln -s "$PWD/skills/plan-audit" ~/.agents/skills/plan-audit   # Codex, Cursor
-ln -s "$PWD/skills/plan-audit" ~/.claude/skills/plan-audit   # Claude Code
-ln -s "$PWD/skills/plan-audit" ~/.gemini/skills/plan-audit   # Gemini CLI, Antigravity CLI
+ln -sn "$PWD/skills/plan-audit" ~/.agents/skills/plan-audit   # Codex, Cursor
+ln -sn "$PWD/skills/plan-audit" ~/.claude/skills/plan-audit   # Claude Code
+ln -sn "$PWD/skills/plan-audit" ~/.gemini/skills/plan-audit   # Gemini CLI, Antigravity CLI
 ```
 
-`ln -s` refuses to replace an existing path. If a link already exists, the skill is already installed there.
+`ln -sn` refuses to replace an existing path and stops with "File exists". When that happens, check where the existing link points with `readlink -f ~/.claude/skills/plan-audit` (or the matching path). If it isn't this checkout, remove the old link and run the command again.
 
 ## Use `plan-audit`
 
@@ -44,8 +44,9 @@ codex exec --sandbox workspace-write '$plan-audit headless docs/plans/my-plan.md
 # Claude Code: allow file edits plus the commands the audit runs for evidence.
 # The prompt goes first: --allowedTools takes a list and would swallow it.
 # --add-dir lets the run read the skill's reference files through the symlink.
+# Add your project's test command to --allowedTools so the audit can run the suite.
 claude -p '/plan-audit headless docs/plans/my-plan.md' --add-dir "$(readlink -f ~/.claude/skills/plan-audit)" \
-  --permission-mode acceptEdits --allowedTools "Bash(git:*)"
+  --permission-mode acceptEdits --allowedTools "Bash(git:*)" "Bash(python3:*)"
 ```
 
 Without write access the audit returns the full report in its final message and says why the file wasn't written.
