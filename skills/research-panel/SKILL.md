@@ -1,6 +1,6 @@
 ---
 name: research-panel
-description: Verify claims and assumptions against the live web with three role-assigned delegates. Trigger this if the user says 'research panel'.
+description: Trigger this only if the user says 'research panel'.
 ---
 
 # Research panel
