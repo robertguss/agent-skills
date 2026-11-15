@@ -7,6 +7,7 @@ Portable agent skills in the open [Agent Skills](https://agentskills.io/specific
 | Skill | What it does |
 |---|---|
 | [`plan-audit`](skills/plan-audit/SKILL.md) | Audits an implementation plan or spec written by an AI agent. It runs in a fresh session, ideally on a different model from the one that wrote the plan. It drafts its own approach blind, verifies every claim against the repo, docs, and read-only commands, argues the case against the plan, and writes a separate audit report. The plan itself stays untouched. |
+| [`research-panel`](skills/research-panel/SKILL.md) | Checks the claims and assumptions behind an idea against the live web, so nothing rests on a model's training data. Three delegates on three model providers each take a role, search with Exa and TinyFish, and return a verdict per claim with a quote from a page fetched in that run. |
 
 ## Install
 
@@ -15,6 +16,8 @@ Install with the [`skills` CLI](https://www.skills.sh/docs/cli). It detects the 
 ```bash
 npx skills add robertguss/agent-skills --skill plan-audit --global
 ```
+
+Replace `plan-audit` with any skill name from the table.
 
 Useful flags:
 
@@ -53,6 +56,24 @@ claude -p '/plan-audit headless docs/plans/my-plan.md' --add-dir "$(readlink -f 
 ```
 
 Without write access the audit returns the full report in its final message and says why the file wasn't written.
+
+## Use `research-panel`
+
+Say "research panel" in a session where you have been working on an idea, or name a document to check. The skill numbers every claim and assumption the idea rests on, sends the list to three delegates, and replies with one verdict per claim: `confirmed`, `refuted`, `outdated`, `unverified`, or `contested`. It then restates the idea with the refuted and outdated claims corrected.
+
+Each delegate checks every claim through one role:
+
+| Role | Looks for |
+|---|---|
+| Primary | The source of record: official docs, changelogs, pricing pages, specs, papers, repos. |
+| Skeptic | The refutation: deprecations, failures, contradicting data, credible criticism. |
+| Recency | What changed in the last 12 months: releases, shutdowns, superseding versions. |
+
+It needs:
+
+- A harness that can start subagents on three model providers. The skill names the T3 Code tools and falls back to the harness's own subagent tools. With fewer than three providers it reports that instead of seating one model three times.
+- `EXA_API_KEY` in the environment, for [Exa](https://exa.ai).
+- The [`tinyfish`](https://docs.tinyfish.ai) CLI, signed in.
 
 ## Evals
 
